@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567148490503",
+    "project_id": "fir-loginauth-113ef",
+    "storage_bucket": "fir-loginauth-113ef.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567148490503:android:062e58123d480d42cedfa2",
+        "android_client_info": {
+          "package_name": "com.firebase.loginauth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxwRO-U53DBDWFtebEf1-0jOEKqwNQYEg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

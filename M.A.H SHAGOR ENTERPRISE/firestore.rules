@@ -1,0 +1,141 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // **USER DATA ISOLATION RULES**
+    // Only authenticated users can access their own business data
+    
+    match /users/{userId} {
+      // Users can only access their own user document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // **STOCK MANAGEMENT RULES**
+      match /stocks/{stockId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **ORDER MANAGEMENT RULES**
+      match /orders/{orderId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **DELIVERY MANAGEMENT RULES**
+      match /deliveries/{deliveryId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **SELLS MANAGEMENT RULES**
+      match /sells/{sellId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **DUE ACCOUNT MANAGEMENT RULES**
+      match /due_accounts/{dueAccountId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId
+          && resource.data.userId == request.auth.uid;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **NOTES RULES**
+      match /notes/{noteId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == userId;
+        allow create: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **RECENT ACTIVITIES RULES**
+      match /recent_activities/{activityId} {
+        allow read, write: if request.auth != null
+          && request.auth.uid == userId;
+        allow create: if request.auth != null
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      // **BACKUP DATA RULES**
+      match /backups/{backupId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId
+          && request.resource.data.userId == request.auth.uid;
+      }
+      
+      match /backup_data/{backupId} {
+        allow read, write: if request.auth != null 
+          && request.auth.uid == userId;
+        allow create: if request.auth != null 
+          && request.auth.uid == userId;
+      }
+    }
+    
+    // **GLOBAL SECURITY RULES**
+    
+    // Deny access to all other documents
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // **VALIDATION FUNCTIONS**
+    
+    function isValidStockData() {
+      return request.resource.data.keys().hasAll(['id', 'userId', 'brand', 'size', 'quantity', 'pricePerUnit'])
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity >= 0
+        && request.resource.data.pricePerUnit is number
+        && request.resource.data.pricePerUnit >= 0;
+    }
+    
+    function isValidOrderData() {
+      return request.resource.data.keys().hasAll(['id', 'userId', 'orderId', 'customerName', 'customerPhone', 'totalAmount'])
+        && request.resource.data.totalAmount is number
+        && request.resource.data.totalAmount >= 0
+        && request.resource.data.status in ['Pending', 'Processing', 'Ready', 'Delivered', 'Cancelled'];
+    }
+    
+    function isValidDeliveryData() {
+      return request.resource.data.keys().hasAll(['id', 'userId', 'orderId', 'customerName', 'deliveryStatus'])
+        && request.resource.data.deliveryStatus in ['Pending', 'InTransit', 'Delivered', 'Failed'];
+    }
+    
+    function isValidSellData() {
+      return request.resource.data.keys().hasAll(['id', 'userId', 'customerName', 'totalAmount', 'paymentStatus'])
+        && request.resource.data.totalAmount is number
+        && request.resource.data.totalAmount >= 0
+        && request.resource.data.paymentStatus in ['Paid', 'Partial', 'Due'];
+    }
+    
+    function isValidDueAccountData() {
+      return request.resource.data.keys().hasAll(['id', 'userId', 'customerName', 'totalDueAmount', 'remainingAmount'])
+        && request.resource.data.totalDueAmount is number
+        && request.resource.data.totalDueAmount >= 0
+        && request.resource.data.remainingAmount is number
+        && request.resource.data.remainingAmount >= 0;
+    }
+  }
+}

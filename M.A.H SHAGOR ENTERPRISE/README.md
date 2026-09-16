@@ -1,4 +1,4 @@
-# Firebase Authentication Android App
+# M.A.H Shagor Enterprise Android App
 
 A modern Android application demonstrating Firebase Authentication with email/password sign-in and sign-up functionality using Jetpack Compose.
 
